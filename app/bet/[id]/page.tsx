@@ -9,8 +9,6 @@ export default function BetDetail() {
   const [bet, setBet] = useState<any>(null)
   const [participants, setParticipants] = useState<any[]>([])
   const [checks, setChecks] = useState<Record<string, string[]>>({})
-  const [myNickname, setMyNickname] = useState('')
-  const [showNicknameInput, setShowNicknameInput] = useState(false)
 
   const today = new Date().toISOString().slice(0, 10)
 
@@ -39,13 +37,10 @@ export default function BetDetail() {
   async function handleCheck(participantId: string) {
     const alreadyChecked = checks[participantId]?.includes(today)
     if (alreadyChecked) {
-      await supabase.from('daily_checks')
-        .delete()
-        .eq('participant_id', participantId)
-        .eq('check_date', today)
+      await supabase.from('daily_checks').delete()
+        .eq('participant_id', participantId).eq('check_date', today)
     } else {
-      await supabase.from('daily_checks')
-        .insert({ participant_id: participantId, check_date: today })
+      await supabase.from('daily_checks').insert({ participant_id: participantId, check_date: today })
     }
     loadParticipants()
   }
@@ -71,13 +66,11 @@ export default function BetDetail() {
       <p className={`text-sm mt-2 font-medium ${isPastDeadline ? 'text-red-500' : 'text-orange-500'}`}>
         {isPastDeadline ? '마감됨!' : '마감: ' + new Date(bet.deadline).toLocaleDateString('ko-KR')}
       </p>
-
       <button
-        onClick={() => { navigator.clipboard.writeText(inviteUrl); alert('링크 복사됨! 친구에게 보내세요') }}
+        onClick={() => { navigator.clipboard.writeText(inviteUrl); alert('링크 복사됨!') }}
         className="w-full border-2 border-dashed border-gray-300 rounded-lg p-3 text-gray-500 mt-4 hover:border-black transition-colors">
         친구 초대 링크 복사
       </button>
-
       <h2 className="font-bold text-lg mt-6 mb-3">참여자 {participants.length}명</h2>
       <div className="space-y-3">
         {participants.length === 0 && (
@@ -100,32 +93,22 @@ export default function BetDetail() {
                 }
               </div>
               <p className="text-sm text-gray-600">목표: {p.goal}</p>
-
               <div>
                 <div className="flex justify-between text-xs text-gray-500 mb-1">
-                  <span>달성률 {checkedDays}일 체크</span>
+                  <span>{checkedDays}일 체크</span>
                   <span className="font-semibold">{rate}%</span>
                 </div>
                 <div className="w-full bg-gray-100 rounded-full h-2">
-                  <div
-                    className="bg-black rounded-full h-2 transition-all"
-                    style={{ width: rate + '%' }}
-                  />
+                  <div className="bg-black rounded-full h-2 transition-all" style={{ width: rate + '%' }} />
                 </div>
               </div>
-
               {!isPastDeadline && (
                 <button
                   onClick={() => handleCheck(p.id)}
-                  className={`w-full rounded-lg p-2 text-sm font-semibold transition-all ${
-                    checkedToday
-                      ? 'bg-green-500 text-white'
-                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                  }`}>
+                  className={`w-full rounded-lg p-2 text-sm font-semibold transition-all ${checkedToday ? 'bg-green-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>
                   {checkedToday ? '오늘 완료! (취소하려면 클릭)' : '오늘 했어요!'}
                 </button>
               )}
-
               <div className={`rounded-lg p-2 text-sm ${isFailed ? 'bg-red-100 text-red-700' : 'bg-gray-100 text-gray-400'}`}>
                 {isFailed ? '벌칙: ' + p.penalty : '벌칙은 마감 후 공개'}
               </div>
@@ -133,7 +116,6 @@ export default function BetDetail() {
           )
         })}
       </div>
-
       {!isPastDeadline && (
         <Link href={'/bet/' + id + '/join'}
           className="block w-full bg-black text-white rounded-lg p-3 font-semibold text-center mt-6">
